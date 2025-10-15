@@ -1,47 +1,28 @@
-import {
-  Card,
-  CardActionArea,
-  CardContent,
-  CardMedia,
-  Chip,
-  Rating,
-  Typography
-} from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import { Book } from "../services/api";
+import Card from '@mui/material/Card'
+import CardMedia from '@mui/material/CardMedia'
+import CardContent from '@mui/material/CardContent'
+import Typography from '@mui/material/Typography'
+import Box from '@mui/material/Box'
+import Rating from '@mui/material/Rating'
+import { Link as RouterLink } from 'react-router-dom'
+import { Book } from '../types/book'
 
-interface Props {
-  book: Book;
+export function BookCard({ book }: { book: Book }) {
+  return (
+    <Card component={RouterLink} to={`/books/${book.id}`} sx={{ textDecoration: 'none' }}>
+      {book.coverUrl && (
+        <CardMedia component="img" height="200" image={book.coverUrl} alt={book.title} />
+      )}
+      <CardContent>
+        <Typography gutterBottom variant="subtitle1" noWrap>{book.title}</Typography>
+        <Typography variant="body2" color="text.secondary" noWrap>{book.author}</Typography>
+        <Box display="flex" alignItems="center" mt={1}>
+          <Rating name="read-only" size="small" value={book.rating} precision={0.5} readOnly />
+          <Typography variant="caption" ml={0.5}>{book.rating.toFixed(1)}</Typography>
+        </Box>
+      </CardContent>
+    </Card>
+  )
 }
 
-export const BookCard = ({ book }: Props) => {
-  const navigate = useNavigate();
-  return (
-    <Card>
-      <CardActionArea onClick={() => navigate(`/books/${book.id}`)}>
-        <CardMedia
-          component="img"
-          height="220"
-          image={book.cover_url}
-          alt={book.title}
-        />
-        <CardContent>
-          <Typography variant="h6" fontWeight={700} noWrap>
-            {book.title}
-          </Typography>
-          <Typography variant="body2" color="text.secondary" noWrap>
-            {book.author}
-          </Typography>
-          <Chip size="small" label={book.genre} sx={{ mt: 1 }} />
-          <Rating
-            size="small"
-            value={book.rating}
-            precision={0.5}
-            readOnly
-            sx={{ mt: 1 }}
-          />
-        </CardContent>
-      </CardActionArea>
-    </Card>
-  );
-};
+

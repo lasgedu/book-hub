@@ -1,19 +1,17 @@
-import { Grid } from "@mui/material";
-import { Book } from "../services/api";
-import { BookCard } from "./BookCard";
+import Grid from '@mui/material/Grid'
+import { Book } from '../types/book'
+import { BookCard } from './BookCard'
 
-interface Props {
-  books: Book[];
-}
+type Props = { items: Book[] }
 
-export const BookList = ({ books }: Props) => {
+export function BookList({ items }: Props) {
   return (
-    <Grid container spacing={3}>
-      {books.map((book) => (
-        <Grid key={book.id} item xs={12} sm={6} md={4} lg={3}>
-          <BookCard book={book} />
+    <Grid container spacing={2}>
+      {items.map(b => (
+        <Grid key={b.id} item xs={12} sm={6} md={3}>
+          <BookCard book={b} />
         </Grid>
       ))}
     </Grid>
-  );
-};
+  )
+}
