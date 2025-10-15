@@ -1,145 +1,165 @@
-import {
-  Alert,
-  Box,
-  Button,
-  Grid,
-  Paper,
-  TextField,
-  Typography
-} from "@mui/material";
-import { FormEvent, useState } from "react";
-import { useAuth } from "../context/AuthContext";
-import { createBook, Book } from "../services/api";
+import { useState } from 'react'
+import Typography from '@mui/material/Typography'
+import Paper from '@mui/material/Paper'
+import TextField from '@mui/material/TextField'
+import Button from '@mui/material/Button'
+import Stack from '@mui/material/Stack'
+import Alert from '@mui/material/Alert'
+import MenuItem from '@mui/material/MenuItem'
+import Grid from '@mui/material/Grid'
+import axios from 'axios'
+import { useAuth } from '../state/auth/AuthContext'
 
-export const AdminPage = () => {
-  const { token } = useAuth();
-  const [form, setForm] = useState<Partial<Book>>({
-    title: "",
-    author: "",
-    genre: "",
-    description: "",
-    publication_year: new Date().getFullYear(),
-    rating: 4
-  });
-  const [success, setSuccess] = useState("");
-  const [error, setError] = useState("");
+const genres = ['Fiction', 'Non-Fiction', 'Science', 'Fantasy', 'Romance', 'History', 'Biography']
 
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault();
-    if (!token) return;
+export function AdminPage() {
+  const { token } = useAuth()
+  const [title, setTitle] = useState('')
+  const [author, setAuthor] = useState('')
+  const [genre, setGenre] = useState('Fiction')
+  const [description, setDescription] = useState('')
+  const [coverUrl, setCoverUrl] = useState('')
+  const [publishedDate, setPublishedDate] = useState('')
+  const [rating, setRating] = useState('4.0')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState(false)
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
+    setSuccess(false)
+    
     try {
-      await createBook(form, token);
-      setSuccess("Book added successfully");
-      setForm((prev) => ({ ...prev, title: "", author: "", description: "" }));
-    } catch (err) {
-      setError("Unable to add book");
+      await axios.post('/api/books', {
+        title,
+        author,
+        genre,
+        description,
+        coverUrl: coverUrl || null,
+        publishedDate,
+        rating: parseFloat(rating)
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      
+      setSuccess(true)
+      // Reset form
+      setTitle('')
+      setAuthor('')
+      setGenre('Fiction')
+      setDescription('')
+      setCoverUrl('')
+      setPublishedDate('')
+      setRating('4.0')
+      
+      setTimeout(() => setSuccess(false), 3000)
+    } catch (err: any) {
+      setError(err?.response?.data?.message || err.message)
+    } finally {
+      setLoading(false)
     }
-  };
+  }
 
   return (
-    <Box py={4}>
-      <Typography variant="h4" gutterBottom>
-        Admin Dashboard
+    <Paper sx={{ maxWidth: 800, mx: 'auto', p: 4 }}>
+      <Typography variant="h4" gutterBottom>Add New Book</Typography>
+      <Typography variant="body2" color="text.secondary" paragraph>
+        Use this form to add books to the Book Hub collection.
       </Typography>
-      <Paper sx={{ p: 3 }}>
-        <Typography variant="h6">Add New Book</Typography>
-        <Box component="form" onSubmit={handleSubmit} mt={2}>
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={6}>
-              <TextField
-                label="Title"
-                value={form.title ?? ""}
-                onChange={(event) =>
-                  setForm((prev) => ({ ...prev, title: event.target.value }))
-                }
-                fullWidth
-                required
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                label="Author"
-                value={form.author ?? ""}
-                onChange={(event) =>
-                  setForm((prev) => ({ ...prev, author: event.target.value }))
-                }
-                fullWidth
-                required
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                label="Genre"
-                value={form.genre ?? ""}
-                onChange={(event) =>
-                  setForm((prev) => ({ ...prev, genre: event.target.value }))
-                }
-                fullWidth
-                required
-              />
-            </Grid>
-            <Grid item xs={6} md={3}>
-              <TextField
-                label="Year"
-                type="number"
-                value={form.publication_year ?? ""}
-                onChange={(event) =>
-                  setForm((prev) => ({
-                    ...prev,
-                    publication_year: Number(event.target.value)
-                  }))
-                }
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={6} md={3}>
-              <TextField
-                label="Rating"
-                type="number"
-                inputProps={{ step: 0.1, min: 0, max: 5 }}
-                value={form.rating ?? 0}
-                onChange={(event) =>
-                  setForm((prev) => ({
-                    ...prev,
-                    rating: Number(event.target.value)
-                  }))
-                }
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                label="Description"
-                value={form.description ?? ""}
-                onChange={(event) =>
-                  setForm((prev) => ({
-                    ...prev,
-                    description: event.target.value
-                  }))
-                }
-                multiline
-                rows={4}
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Button type="submit" variant="contained">
-                Save
-              </Button>
-            </Grid>
+      
+      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+      {success && <Alert severity="success" sx={{ mb: 2 }}>Book added successfully!</Alert>}
+      
+      <form onSubmit={handleSubmit}>
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={6}>
+            <TextField 
+              label="Title" 
+              value={title} 
+              onChange={(e) => setTitle(e.target.value)} 
+              required 
+              fullWidth
+            />
           </Grid>
-        </Box>
-        {success && (
-          <Alert severity="success" sx={{ mt: 2 }}>
-            {success}
-          </Alert>
-        )}
-        {error && (
-          <Alert severity="error" sx={{ mt: 2 }}>
-            {error}
-          </Alert>
-        )}
-      </Paper>
-    </Box>
-  );
-};
+          <Grid item xs={12} md={6}>
+            <TextField 
+              label="Author" 
+              value={author} 
+              onChange={(e) => setAuthor(e.target.value)} 
+              required 
+              fullWidth
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <TextField 
+              select
+              label="Genre" 
+              value={genre} 
+              onChange={(e) => setGenre(e.target.value)} 
+              required 
+              fullWidth
+            >
+              {genres.map(g => <MenuItem key={g} value={g}>{g}</MenuItem>)}
+            </TextField>
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <TextField 
+              label="Published Date" 
+              type="date"
+              value={publishedDate} 
+              onChange={(e) => setPublishedDate(e.target.value)} 
+              required 
+              fullWidth
+              InputLabelProps={{ shrink: true }}
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <TextField 
+              label="Cover Image URL" 
+              value={coverUrl} 
+              onChange={(e) => setCoverUrl(e.target.value)} 
+              fullWidth
+              placeholder="https://example.com/cover.jpg"
+            />
+          </Grid>
+          <Grid item xs={12} md={6}>
+            <TextField 
+              label="Rating" 
+              type="number"
+              value={rating} 
+              onChange={(e) => setRating(e.target.value)} 
+              required 
+              fullWidth
+              inputProps={{ min: 0, max: 5, step: 0.1 }}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <TextField 
+              label="Description" 
+              value={description} 
+              onChange={(e) => setDescription(e.target.value)} 
+              required 
+              fullWidth
+              multiline
+              rows={4}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <Stack direction="row" spacing={2} justifyContent="flex-end">
+              <Button 
+                type="submit" 
+                variant="contained" 
+                size="large"
+                disabled={loading}
+              >
+                {loading ? 'Adding Book...' : 'Add Book'}
+              </Button>
+            </Stack>
+          </Grid>
+        </Grid>
+      </form>
+    </Paper>
+  )
+}
