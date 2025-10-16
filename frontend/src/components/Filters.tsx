@@ -35,7 +35,7 @@ export function Filters() {
         </Grid>
       </Grid>
       <Grid container spacing={2}>
-        <Grid item xs={6} md={3}>
+        <Grid item xs={6} md={2}>
           <TextField select label="Sort By" fullWidth value={filtering.sortBy} onChange={(e) => dispatch(setSort({ sortBy: e.target.value as any, sortOrder: filtering.sortOrder }))}>
             <MenuItem value="createdAt">Recently Added</MenuItem>
             <MenuItem value="title">Title</MenuItem>
@@ -44,13 +44,13 @@ export function Filters() {
             <MenuItem value="rating">Rating</MenuItem>
           </TextField>
         </Grid>
-        <Grid item xs={6} md={3}>
+        <Grid item xs={6} md={2}>
           <TextField select label="Order" fullWidth value={filtering.sortOrder} onChange={(e) => dispatch(setSort({ sortBy: filtering.sortBy, sortOrder: e.target.value as any }))}>
             <MenuItem value="asc">Ascending</MenuItem>
             <MenuItem value="desc">Descending</MenuItem>
           </TextField>
         </Grid>
-        <Grid item xs={12} md={6} display="flex" justifyContent="flex-end" alignItems="center">
+        <Grid item xs={12} md={8} display="flex" justifyContent="flex-end" alignItems="center">
           <Button variant="outlined" onClick={() => dispatch(resetFilters())}>Reset</Button>
         </Grid>
       </Grid>

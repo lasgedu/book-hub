@@ -5,8 +5,10 @@ import Paper from '@mui/material/Paper'
 import Typography from '@mui/material/Typography'
 import Stack from '@mui/material/Stack'
 import Alert from '@mui/material/Alert'
+import Link from '@mui/material/Link'
+import Box from '@mui/material/Box'
 import { useAuth } from '../state/auth/AuthContext'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom'
 
 export function LoginPage() {
   const { login } = useAuth()
@@ -33,14 +35,47 @@ export function LoginPage() {
   }
 
   return (
-    <Paper sx={{ maxWidth: 420, mx: 'auto', p: 3 }}>
-      <Typography variant="h5" gutterBottom>Login</Typography>
+    <Paper sx={{ maxWidth: 420, mx: 'auto', p: 3, mt: 4 }}>
+      <Typography variant="h5" gutterBottom align="center">Login to Book Hub</Typography>
+      <Typography variant="body2" color="text.secondary" align="center" paragraph>
+        Access your personalized book collection
+      </Typography>
+      
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+      
+      <Box sx={{ bgcolor: 'info.light', p: 2, borderRadius: 1, mb: 2 }}>
+        <Typography variant="caption" display="block">Demo Credentials:</Typography>
+        <Typography variant="body2"><strong>Email:</strong> demo@bookhub.local</Typography>
+        <Typography variant="body2"><strong>Password:</strong> password123</Typography>
+      </Box>
+      
       <form onSubmit={handleSubmit}>
         <Stack spacing={2}>
-          <TextField label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-          <TextField label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-          <Button type="submit" variant="contained" disabled={loading}>{loading ? 'Signing in…' : 'Login'}</Button>
+          <TextField 
+            label="Email" 
+            type="email" 
+            value={email} 
+            onChange={(e) => setEmail(e.target.value)} 
+            required 
+            fullWidth
+          />
+          <TextField 
+            label="Password" 
+            type="password" 
+            value={password} 
+            onChange={(e) => setPassword(e.target.value)} 
+            required 
+            fullWidth
+          />
+          <Button type="submit" variant="contained" size="large" disabled={loading}>
+            {loading ? 'Signing in...' : 'Login'}
+          </Button>
+          <Typography variant="body2" align="center">
+            Don't have an account?{' '}
+            <Link component={RouterLink} to="/register">
+              Register here
+            </Link>
+          </Typography>
         </Stack>
       </form>
     </Paper>

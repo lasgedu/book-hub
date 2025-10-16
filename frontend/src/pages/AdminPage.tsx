@@ -18,7 +18,7 @@ export function AdminPage() {
   const [author, setAuthor] = useState('')
   const [genre, setGenre] = useState('Fiction')
   const [description, setDescription] = useState('')
-  const [coverUrl, setCoverUrl] = useState('')
+  const [coverImage, setCoverImage] = useState<File | null>(null)
   const [publishedDate, setPublishedDate] = useState('')
   const [rating, setRating] = useState('4.0')
   const [loading, setLoading] = useState(false)
@@ -32,16 +32,22 @@ export function AdminPage() {
     setSuccess(false)
     
     try {
-      await axios.post('/api/books', {
-        title,
-        author,
-        genre,
-        description,
-        coverUrl: coverUrl || null,
-        publishedDate,
-        rating: parseFloat(rating)
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
+      const formData = new FormData()
+      formData.append('title', title)
+      formData.append('author', author)
+      formData.append('genre', genre)
+      formData.append('description', description)
+      formData.append('publishedDate', publishedDate)
+      formData.append('rating', rating)
+      if (coverImage) {
+        formData.append('coverImage', coverImage)
+      }
+      
+      await axios.post('/api/books', formData, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
       })
       
       setSuccess(true)
@@ -50,7 +56,7 @@ export function AdminPage() {
       setAuthor('')
       setGenre('Fiction')
       setDescription('')
-      setCoverUrl('')
+      setCoverImage(null)
       setPublishedDate('')
       setRating('4.0')
       
@@ -65,9 +71,6 @@ export function AdminPage() {
   return (
     <Paper sx={{ maxWidth: 800, mx: 'auto', p: 4 }}>
       <Typography variant="h4" gutterBottom>Add New Book</Typography>
-      <Typography variant="body2" color="text.secondary" paragraph>
-        Use this form to add books to the Book Hub collection.
-      </Typography>
       
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
       {success && <Alert severity="success" sx={{ mb: 2 }}>Book added successfully!</Alert>}
@@ -116,13 +119,20 @@ export function AdminPage() {
             />
           </Grid>
           <Grid item xs={12} md={6}>
-            <TextField 
-              label="Cover Image URL" 
-              value={coverUrl} 
-              onChange={(e) => setCoverUrl(e.target.value)} 
+            <Button
+              variant="outlined"
+              component="label"
               fullWidth
-              placeholder="https://example.com/cover.jpg"
-            />
+              sx={{ height: '56px' }}
+            >
+              {coverImage ? coverImage.name : 'Upload Cover Image'}
+              <input
+                type="file"
+                hidden
+                accept="image/*"
+                onChange={(e) => setCoverImage(e.target.files?.[0] || null)}
+              />
+            </Button>
           </Grid>
           <Grid item xs={12} md={6}>
             <TextField 

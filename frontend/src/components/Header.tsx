@@ -10,19 +10,30 @@ export function Header() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
   return (
-    <AppBar position="static" color="transparent" elevation={0}>
+    <AppBar position="static" sx={{ bgcolor: 'white', color: 'primary.main', borderBottom: 1, borderColor: 'divider' }} elevation={0}>
       <Toolbar>
-        <Typography variant="h6" component={RouterLink} to="/" sx={{ flexGrow: 1, textDecoration: 'none', color: 'inherit' }}>
+        <Typography variant="h4" component={RouterLink} to="/" sx={{ flexGrow: 1, textDecoration: 'none', color: 'inherit', fontWeight: 'bold' }}>
           Book Hub
         </Typography>
-        <Box display="flex" gap={1}>
+        <Box display="flex" gap={2} alignItems="center">
           {user ? (
             <>
-              <Typography variant="body2" color="text.secondary">{user.email}</Typography>
-              <Button variant="outlined" size="small" onClick={() => { logout(); navigate('/'); }}>Logout</Button>
+              <Button component={RouterLink} to="/admin" variant="outlined" size="small">
+                Add Book
+              </Button>
+              <Button variant="contained" size="small" onClick={() => { logout(); navigate('/'); }}>
+                Logout
+              </Button>
             </>
           ) : (
-            <Button component={RouterLink} to="/login" variant="contained" size="small">Login</Button>
+            <>
+              <Button component={RouterLink} to="/register" variant="outlined" size="small">
+                Register
+              </Button>
+              <Button component={RouterLink} to="/login" variant="contained" size="small">
+                Login
+              </Button>
+            </>
           )}
         </Box>
       </Toolbar>

@@ -3,6 +3,7 @@ import Grid from '@mui/material/Grid'
 import Typography from '@mui/material/Typography'
 import CircularProgress from '@mui/material/CircularProgress'
 import Alert from '@mui/material/Alert'
+import Box from '@mui/material/Box'
 import { useSelector } from 'react-redux'
 import { RootState } from '../store/store'
 import { booksApi } from '../utils/booksApi'
@@ -35,20 +36,46 @@ export function HomePage() {
 
   return (
     <>
-      <Typography variant="h4" gutterBottom>Discover Books</Typography>
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h4" gutterBottom fontWeight="bold">
+          Discover Books
+        </Typography>
+        <Typography variant="subtitle1" color="text.secondary">
+          Explore our book Collections
+        </Typography>
+      </Box>
+      
       <Filters />
-      {loading && <CircularProgress sx={{ mt: 3 }} />}
+      
+      {loading && (
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="300px">
+          <CircularProgress size={60} />
+        </Box>
+      )}
+      
       {error && <Alert severity="error" sx={{ mt: 3 }}>{error}</Alert>}
-      {data && (
+      
+      {data && !loading && (
         <>
-          <Grid container spacing={2} sx={{ mt: 1 }}>
-            {data.items.map((b: Book) => (
-              <Grid key={b.id} item xs={12} sm={6} md={3}>
-                <BookCard book={b} />
+          {data.items.length === 0 ? (
+            <Alert severity="info" sx={{ mt: 3 }}>
+              No books found matching your criteria. Try adjusting your filters.
+            </Alert>
+          ) : (
+            <>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 3, mb: 2 }}>
+                Showing {data.items.length} of {data.total} books (Page {data.page})
+              </Typography>
+              <Grid container spacing={3} sx={{ mt: 1 }}>
+                {data.items.map((b: Book) => (
+                  <Grid key={b.id} item xs={12} sm={6} md={4} lg={3}>
+                    <BookCard book={b} />
+                  </Grid>
+                ))}
               </Grid>
-            ))}
-          </Grid>
-          <PaginationBar total={data.total} />
+              <PaginationBar total={data.total} />
+            </>
+          )}
         </>
       )}
     </>
