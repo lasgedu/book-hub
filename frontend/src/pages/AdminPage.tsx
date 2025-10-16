@@ -18,7 +18,7 @@ export function AdminPage() {
   const [author, setAuthor] = useState('')
   const [genre, setGenre] = useState('Fiction')
   const [description, setDescription] = useState('')
-  const [coverImage, setCoverImage] = useState<File | null>(null)
+  const [coverUrl, setCoverUrl] = useState('')
   const [publishedDate, setPublishedDate] = useState('')
   const [rating, setRating] = useState('4.0')
   const [loading, setLoading] = useState(false)
@@ -32,22 +32,16 @@ export function AdminPage() {
     setSuccess(false)
     
     try {
-      const formData = new FormData()
-      formData.append('title', title)
-      formData.append('author', author)
-      formData.append('genre', genre)
-      formData.append('description', description)
-      formData.append('publishedDate', publishedDate)
-      formData.append('rating', rating)
-      if (coverImage) {
-        formData.append('coverImage', coverImage)
-      }
-      
-      await axios.post('/api/books', formData, {
-        headers: { 
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
-        }
+      await axios.post('/api/books', {
+        title,
+        author,
+        genre,
+        description,
+        coverUrl: coverUrl || null,
+        publishedDate,
+        rating: parseFloat(rating)
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
       })
       
       setSuccess(true)
@@ -56,7 +50,7 @@ export function AdminPage() {
       setAuthor('')
       setGenre('Fiction')
       setDescription('')
-      setCoverImage(null)
+      setCoverUrl('')
       setPublishedDate('')
       setRating('4.0')
       
@@ -119,20 +113,13 @@ export function AdminPage() {
             />
           </Grid>
           <Grid item xs={12} md={6}>
-            <Button
-              variant="outlined"
-              component="label"
+            <TextField 
+              label="Cover Image URL (optional)" 
+              value={coverUrl} 
+              onChange={(e) => setCoverUrl(e.target.value)} 
               fullWidth
-              sx={{ height: '56px' }}
-            >
-              {coverImage ? coverImage.name : 'Upload Cover Image'}
-              <input
-                type="file"
-                hidden
-                accept="image/*"
-                onChange={(e) => setCoverImage(e.target.files?.[0] || null)}
-              />
-            </Button>
+              placeholder="/images/books/book-cover.jpg"
+            />
           </Grid>
           <Grid item xs={12} md={6}>
             <TextField 

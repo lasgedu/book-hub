@@ -6,7 +6,6 @@ import Typography from '@mui/material/Typography'
 import Stack from '@mui/material/Stack'
 import Alert from '@mui/material/Alert'
 import Link from '@mui/material/Link'
-import Box from '@mui/material/Box'
 import { useAuth } from '../state/auth/AuthContext'
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom'
 
@@ -14,8 +13,8 @@ export function LoginPage() {
   const { login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation() as any
-  const [email, setEmail] = useState('demo@bookhub.local')
-  const [password, setPassword] = useState('password123')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -42,12 +41,6 @@ export function LoginPage() {
       </Typography>
       
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-      
-      <Box sx={{ bgcolor: 'info.light', p: 2, borderRadius: 1, mb: 2 }}>
-        <Typography variant="caption" display="block">Demo Credentials:</Typography>
-        <Typography variant="body2"><strong>Email:</strong> demo@bookhub.local</Typography>
-        <Typography variant="body2"><strong>Password:</strong> password123</Typography>
-      </Box>
       
       <form onSubmit={handleSubmit}>
         <Stack spacing={2}>
