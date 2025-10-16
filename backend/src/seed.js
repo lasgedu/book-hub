@@ -3,7 +3,7 @@ import { db, migrate } from "./db.js"
 import bcrypt from "bcryptjs"
 migrate()
 const demoEmail = "heynedu@gmail.com"
-const passwordHash = bcrypt.hashSync("password123", 10)
+const passwordHash = bcrypt.hashSync("000000", 10)
 const existing = db.prepare("SELECT * FROM users WHERE email = ?").get(demoEmail)
 if (!existing) {
   const createdAt = new Date().toISOString()
